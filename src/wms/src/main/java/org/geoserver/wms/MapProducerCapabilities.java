@@ -44,6 +44,7 @@ public class MapProducerCapabilities {
     /**
      * Returns true if the map producer can handle list or results (one per time/elevation/dimension
      * value) instead of a single one
+     * 如果映射生成器可以处理列表或结果（每个时间/高程/维度值一个）而不是单个列表或结果，则返回true
      */
     public boolean isMultivalueRequestsSupported() {
         return multivalueRequestsSupported;

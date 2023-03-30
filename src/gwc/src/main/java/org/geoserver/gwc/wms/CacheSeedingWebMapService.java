@@ -5,10 +5,6 @@
  */
 package org.geoserver.gwc.wms;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-import java.lang.reflect.Method;
-import java.util.Map;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.geoserver.gwc.layer.GeoServerTileLayer;
@@ -17,6 +13,11 @@ import org.geoserver.util.HTTPWarningAppender;
 import org.geoserver.wms.GetMapRequest;
 import org.geoserver.wms.WebMap;
 import org.geoserver.wms.WebMapService;
+
+import java.lang.reflect.Method;
+import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * {@link WebMapService#getMap(GetMapRequest)} Spring's AOP method interceptor to seed a (meta)tile
@@ -31,15 +32,16 @@ import org.geoserver.wms.WebMapService;
  */
 public class CacheSeedingWebMapService implements MethodInterceptor {
 
-    public CacheSeedingWebMapService() {}
+    public CacheSeedingWebMapService() {
+    }
 
     /**
      * Wraps {@link WebMapService#getMap(GetMapRequest)}, called by the {@link Dispatcher}
      *
      * @see WebMapService#getMap(GetMapRequest)
-     * @see
-     *     org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
+     * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
      */
+    @Override
     public WebMap invoke(MethodInvocation invocation) throws Throwable {
 
         final Method method = invocation.getMethod();

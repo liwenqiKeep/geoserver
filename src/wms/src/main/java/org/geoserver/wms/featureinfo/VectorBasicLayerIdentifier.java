@@ -178,7 +178,8 @@ public class VectorBasicLayerIdentifier extends AbstractVectorLayerIdentifier {
         if (buffer <= 0) {
             Integer layerBuffer = null;
             final LayerInfo layerInfo = layer.getLayerInfo();
-            if (layerInfo != null) { // it is a local layer
+            // it is a local layer
+            if (layerInfo != null) {
                 layerBuffer = layerInfo.getMetadata().get(LayerInfo.BUFFER, Integer.class);
             }
             if (layerBuffer != null && layerBuffer > 0) {

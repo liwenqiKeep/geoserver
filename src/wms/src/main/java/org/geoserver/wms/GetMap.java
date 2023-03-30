@@ -219,7 +219,7 @@ public class GetMap {
         final int numTimes = times.size();
         boolean singleTimeRange = numTimes == 1 && times.get(0) instanceof DateRange;
 
-        // ELEVATION
+        // ELEVATION  高程
         List<Object> elevations = request.getElevation();
         final int numElevations = elevations.size();
         boolean singleElevationRange =
@@ -227,6 +227,7 @@ public class GetMap {
 
         // handling time series and elevation series
         MaxAnimationTimeHelper maxAnimationTimeHelper = new MaxAnimationTimeHelper(wms, request);
+        // 帧数限制
         int maxAllowedFrames = wms.getMaxAllowedFrames();
         if ((numTimes > 1 || singleTimeRange) && isMultivaluedSupported) {
             WebMap map = null;
@@ -490,6 +491,7 @@ public class GetMap {
             final org.geotools.map.Layer layer;
 
             int layerType = mapLayerInfo.getType();
+            // 远程矢量数据
             if (layerType == MapLayerInfo.TYPE_REMOTE_VECTOR) {
 
                 final SimpleFeatureSource source = mapLayerInfo.getRemoteFeatureSource();

@@ -42,7 +42,7 @@ public class CachingWebMapService implements MethodInterceptor {
 
     private static final Logger LOGGER = Logging.getLogger(CachingWebMapService.class);
 
-    private GWC gwc;
+    private final GWC gwc;
 
     public CachingWebMapService(GWC gwc) {
         this.gwc = gwc;
@@ -52,9 +52,9 @@ public class CachingWebMapService implements MethodInterceptor {
      * Wraps {@link WebMapService#getMap(GetMapRequest)}, called by the {@link Dispatcher}
      *
      * @see WebMapService#getMap(GetMapRequest)
-     * @see
-     *     org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
+     * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
      */
+    @Override
     public WebMap invoke(MethodInvocation invocation) throws Throwable {
         GWCConfig config = gwc.getConfig();
         if (!config.isDirectWMSIntegrationEnabled()) {
@@ -118,7 +118,7 @@ public class CachingWebMapService implements MethodInterceptor {
         GWC.setConditionalGetHeaders(
                 headers, cachedTile, etag, request.getHttpRequestHeader("If-Modified-Since"));
         GWC.setCacheMetadataHeaders(headers, cachedTile, layer);
-        headers.forEach((k, v) -> map.setResponseHeader(k, v));
+        headers.forEach(map::setResponseHeader);
 
         return map;
     }
@@ -133,7 +133,6 @@ public class CachingWebMapService implements MethodInterceptor {
         checkArgument(arguments.length == 1);
         checkArgument(arguments[0] instanceof GetMapRequest);
 
-        final GetMapRequest request = (GetMapRequest) arguments[0];
-        return request;
+        return (GetMapRequest) arguments[0];
     }
 }

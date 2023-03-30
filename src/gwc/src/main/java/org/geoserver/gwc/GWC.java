@@ -181,7 +181,7 @@ public class GWC implements DisposableBean, InitializingBean, ApplicationContext
     static final Logger log = Logging.getLogger(GWC.class);
 
     /** @see #getResponseEncoder(MimeType, RenderedImageMap) */
-    private Map<String, Response> cachedTileEncoders = new HashMap<>();
+    private final Map<String, Response> cachedTileEncoders = new HashMap<>();
 
     private final TileLayerDispatcher tld;
 
@@ -195,23 +195,23 @@ public class GWC implements DisposableBean, InitializingBean, ApplicationContext
 
     private final GridSetBroker gridSetBroker;
 
-    private DiskQuotaMonitor monitor;
+    private final DiskQuotaMonitor monitor;
 
-    private CatalogLayerEventListener catalogLayerEventListener;
+    private final CatalogLayerEventListener catalogLayerEventListener;
 
-    private CatalogStyleChangeListener catalogStyleChangeListener;
+    private final CatalogStyleChangeListener catalogStyleChangeListener;
 
     /** The catalog, secured and filtered */
     private final Catalog catalog;
 
     /** The raw catalog, non secured. Use with extreme caution! */
-    private Catalog rawCatalog;
+    private final Catalog rawCatalog;
 
-    private ConfigurableLockProvider lockProvider;
+    private final ConfigurableLockProvider lockProvider;
 
-    private JDBCConfigurationStorage jdbcConfigurationStorage;
+    private final JDBCConfigurationStorage jdbcConfigurationStorage;
 
-    private FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
+    private final FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
 
     private GeoWebCacheEnvironment gwcEnvironment;
 
@@ -220,7 +220,7 @@ public class GWC implements DisposableBean, InitializingBean, ApplicationContext
     // list of GeoServer contributed grid sets that should not be editable by the user
     private final Set<String> geoserverEmbeddedGridSets = new HashSet<>();
 
-    private BlobStoreAggregator blobStoreAggregator;
+    private final BlobStoreAggregator blobStoreAggregator;
 
     /**
      * Constructor for the GWC mediator
@@ -321,12 +321,14 @@ public class GWC implements DisposableBean, InitializingBean, ApplicationContext
     }
 
     /** @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet() */
+    @Override
     public void afterPropertiesSet() throws Exception {
         GWC.set(this);
     }
 
     /** @see org.springframework.beans.factory.DisposableBean#destroy() */
-    public void destroy() throws Exception {
+    @Override
+    public void destroy() {
         Catalog catalog = getCatalog();
         if (this.catalogLayerEventListener != null) {
             catalog.removeListener(this.catalogLayerEventListener);
@@ -384,9 +386,12 @@ public class GWC implements DisposableBean, InitializingBean, ApplicationContext
             return;
         }
         log.fine("truncating '" + layerName + "' for style '" + styleName + "'");
-        String gridSetId = null; // all of them
-        BoundingBox bounds = null; // all of them
-        String format = null; // all of them
+        // all of them
+        String gridSetId = null;
+        // all of them
+        BoundingBox bounds = null;
+        // all of them
+        String format = null;
         truncate(layerName, styleName, gridSetId, bounds, format);
     }
 
@@ -396,10 +401,14 @@ public class GWC implements DisposableBean, InitializingBean, ApplicationContext
         log.fine("truncating '" + layerName + "' for default style");
 
         final TileLayer layer = getTileLayerByName(layerName);
-        final Set<String> gridSetIds = layer.getGridSubsets(); // all of them
-        final List<MimeType> mimeTypes = layer.getMimeTypes(); // all of them
-        final BoundingBox bounds = null; // all of them
-        final Map<String, String> parameters = null; // only default style
+        // all of them
+        final Set<String> gridSetIds = layer.getGridSubsets();
+        // all of them
+        final List<MimeType> mimeTypes = layer.getMimeTypes();
+        // all of them
+        final BoundingBox bounds = null;
+        // only default style
+        final Map<String, String> parameters = null;
 
         for (String gridSetId : gridSetIds) {
             GridSubset gridSubset = layer.getGridSubset(gridSetId);
@@ -458,6 +467,7 @@ public class GWC implements DisposableBean, InitializingBean, ApplicationContext
         return truncateAll;
     }
 
+    // 获取图层同bounds相交的边界
     private BoundingBox getIntersectingBounds(
             String layerName, GridSubset layerGrid, ReferencedEnvelope bounds) {
         final GridSet gridSet = layerGrid.getGridSet();
@@ -474,6 +484,7 @@ public class GWC implements DisposableBean, InitializingBean, ApplicationContext
         ReferencedEnvelope truncateBoundsInGridsetCrs;
 
         try {
+            // 统一坐标系
             truncateBoundsInGridsetCrs = bounds.transform(gridSetCrs, true);
         } catch (Exception e) {
             log.warning(
@@ -502,8 +513,7 @@ public class GWC implements DisposableBean, InitializingBean, ApplicationContext
                     "Requested truncation bounds do not intersect cached layer bounds, ignoring truncate request");
             return null;
         }
-        final BoundingBox intersectingBounds = BoundingBox.intersection(layerBounds, reqBounds);
-        return intersectingBounds;
+        return BoundingBox.intersection(layerBounds, reqBounds);
     }
 
     /**
@@ -617,8 +627,7 @@ public class GWC implements DisposableBean, InitializingBean, ApplicationContext
 
     private boolean isStyleCached(final String layerName, final String styleName) {
         Set<String> cachedStyles = getCachedStyles(layerName);
-        boolean styleIsCached = cachedStyles.contains(styleName);
-        return styleIsCached;
+        return cachedStyles.contains(styleName);
     }
 
     /** Returns the names of the styles for the layer, including the default style */

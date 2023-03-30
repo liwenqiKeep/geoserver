@@ -87,7 +87,7 @@ public class Start {
             WebAppContext wah = new WebAppContext(sh, null, null, null);*/
             WebAppContext wah = new WebAppContext();
             wah.setContextPath("/geoserver");
-            wah.setWar("src/main/webapp");
+            wah.setWar("src/web/app/src/main/webapp");
 
             jettyServer.setHandler(wah);
             wah.setTempDirectory(new File("target/work"));

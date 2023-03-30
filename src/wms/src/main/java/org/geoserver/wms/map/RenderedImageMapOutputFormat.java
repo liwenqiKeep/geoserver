@@ -300,10 +300,11 @@ public class RenderedImageMapOutputFormat extends AbstractMapOutputFormat {
             emptyMap = true;
         }
 
+        // 抗锯齿
         String antialias = (String) request.getFormatOptions().get("antialias");
         if (antialias != null) antialias = antialias.toUpperCase();
 
-        // figure out a palette for buffered image creation
+        // figure out a palette for buffered image creation # 找出缓冲图像创建的调色板
         IndexColorModel potentialPalette = null;
         final boolean transparent = mapContent.isTransparent() && isTransparencySupported();
         final Color bgColor = mapContent.getBgColor();
@@ -468,7 +469,7 @@ public class RenderedImageMapOutputFormat extends AbstractMapOutputFormat {
             rendererParams.put(StreamingRenderer.LINE_WIDTH_OPTIMIZATION_KEY, true);
         }
 
-        // turn on advanced projection handling
+        // turn on advanced projection handling 高级投影处理
         if (wms.isAdvancedProjectionHandlingEnabled()) {
             rendererParams.put(StreamingRenderer.ADVANCED_PROJECTION_HANDLING_KEY, true);
             if (request.getFormatOptions().get(ADV_PROJECTION_DENSIFICATION_FORMAT_OPTION)

@@ -5,11 +5,6 @@
  */
 package org.geoserver.gwc.wms;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 import org.geoserver.catalog.PublishedInfo;
 import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.config.ServiceInfo;
@@ -28,6 +23,12 @@ import org.geowebcache.mime.MimeType;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.NamespaceSupport;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Implementation of the {@link ExtendedCapabilitiesProvider} extension point to contribute WMS-C
  * DTD elements and TileSet definitions to the capabilities document of the regular GeoServer WMS.
@@ -45,7 +46,10 @@ public class CachingExtendedCapabilitiesProvider implements ExtendedCapabilities
         this.gwc = gwc;
     }
 
-    /** @see org.geoserver.wms.ExtendedCapabilitiesProvider#getSchemaLocations(String) */
+    /**
+     * @see org.geoserver.wms.ExtendedCapabilitiesProvider#getSchemaLocations(String)
+     */
+    @Override
     public String[] getSchemaLocations(String schemaBaseURL) {
         return new String[0];
     }
@@ -54,6 +58,7 @@ public class CachingExtendedCapabilitiesProvider implements ExtendedCapabilities
      * @return {@code TileSet*}
      * @see org.geoserver.wms.ExtendedCapabilitiesProvider#getVendorSpecificCapabilitiesRoots
      */
+    @Override
     public List<String> getVendorSpecificCapabilitiesRoots(final GetCapabilitiesRequest request) {
         if (gwc.getConfig().isDirectWMSIntegrationEnabled() && isTiled(request)) {
             return Collections.singletonList("TileSet*");
@@ -62,14 +67,14 @@ public class CachingExtendedCapabilitiesProvider implements ExtendedCapabilities
     }
 
     private boolean isTiled(GetCapabilitiesRequest request) {
-        return Boolean.valueOf(request.getRawKvp().get("TILED")).booleanValue()
+        return Boolean.parseBoolean(request.getRawKvp().get("TILED"))
                 || !gwc.getConfig().isRequireTiledParameter();
     }
 
     /**
-     * @see
-     *     org.geoserver.wms.ExtendedCapabilitiesProvider#getVendorSpecificCapabilitiesChildDecls(GetCapabilitiesRequest)
+     * @see org.geoserver.wms.ExtendedCapabilitiesProvider#getVendorSpecificCapabilitiesChildDecls(GetCapabilitiesRequest)
      */
+    @Override
     public List<String> getVendorSpecificCapabilitiesChildDecls(
             final GetCapabilitiesRequest request) {
         if (gwc.getConfig().isDirectWMSIntegrationEnabled() && isTiled(request)) {
@@ -89,9 +94,9 @@ public class CachingExtendedCapabilitiesProvider implements ExtendedCapabilities
     /**
      * Empty implementation, no namespaces to add until we support the WMS-C 1.3 profile
      *
-     * @see
-     *     org.geoserver.wms.ExtendedCapabilitiesProvider#registerNamespaces(org.xml.sax.helpers.NamespaceSupport)
+     * @see org.geoserver.wms.ExtendedCapabilitiesProvider#registerNamespaces(org.xml.sax.helpers.NamespaceSupport)
      */
+    @Override
     public void registerNamespaces(NamespaceSupport namespaces) {
         // nothing to do
     }
@@ -99,6 +104,7 @@ public class CachingExtendedCapabilitiesProvider implements ExtendedCapabilities
     /**
      * @see org.geoserver.wms.ExtendedCapabilitiesProvider#encode(Translator, ServiceInfo, Object)
      */
+    @Override
     public void encode(final Translator tx, final WMSInfo wms, final GetCapabilitiesRequest request)
             throws IOException {
         if (!gwc.getConfig().isDirectWMSIntegrationEnabled()) {
@@ -151,7 +157,7 @@ public class CachingExtendedCapabilitiesProvider implements ExtendedCapabilities
         StringBuilder resolutionsStr = new StringBuilder();
         double[] res = grid.getResolutions();
         for (double re : res) {
-            resolutionsStr.append(Double.toString(re) + " ");
+            resolutionsStr.append(re).append(" ");
         }
 
         String[] bs = boundsPrep(grid.getCoverageBestFitBounds());
@@ -201,13 +207,12 @@ public class CachingExtendedCapabilitiesProvider implements ExtendedCapabilities
     }
 
     String[] boundsPrep(BoundingBox bbox) {
-        String[] bs = {
-            Double.toString(bbox.getMinX()),
-            Double.toString(bbox.getMinY()),
-            Double.toString(bbox.getMaxX()),
-            Double.toString(bbox.getMaxY())
+        return new String[]{
+                Double.toString(bbox.getMinX()),
+                Double.toString(bbox.getMinY()),
+                Double.toString(bbox.getMaxX()),
+                Double.toString(bbox.getMaxY())
         };
-        return bs;
     }
 
     @Override
